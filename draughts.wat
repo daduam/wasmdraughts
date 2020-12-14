@@ -141,4 +141,49 @@
     i32.const 0
     i32.gt_s
   )
+
+  ;; Should piece get crowned?
+  ;; We crown black pieces in row 0, white pieces in row 7
+  (func $shouldCrown (param $pieceY i32) (param $piece i32) (result i32)
+    local.get $pieceY
+    i32.const 0
+    i32.eq
+    local.get $piece
+    call $isBlack
+    i32.and
+    local.get $pieceY
+    i32.const 7
+    i32.eq
+    local.get $piece
+    call $isWhite
+    i32.and
+    i32.or
+  )
+
+  ;; Converts a piece into a crowned piece and invokes
+  ;; a host notifier
+  (func $crownPiece (param $x i32) (param $y i32)
+    (local $piece i32)
+    local.get $x
+    local.get $y
+    call $getPiece
+    local.set $piece
+
+    local.get $x
+    local.get $y
+    local.get $piece
+    call $withCrown
+    call $setPiece
+
+    local.get $x
+    local.get $y
+    call $notify_piececrowned
+  )
+
+  ;; Calculates distance
+  (func $distance (param $x i32) (param $y i32) (result i32)
+    local.get $x
+    local.get $y
+    i32.sub
+  )
 )
