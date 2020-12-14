@@ -1,4 +1,7 @@
 (module
+  (import "events" "piecemoved" (func $notify_piecemoved (param $fromX i32) (param $fromY i32) (param $toX i32) (param $toY i32)))
+  (import "events" "piececrowned" (func $notify_piececrowned (param $pieceX i32) (param $pieceY i32)))
+
   (global $BLACK i32 (i32.const 1))
   (global $WHITE i32 (i32.const 2))
   (global $CROWN i32 (i32.const 4))
@@ -76,11 +79,11 @@
 
   ;; $inRange detects if values are within range (low and high inclusive)
   (func $inRange (param $low i32) (param $high i32) (param $value i32) (result i32)
+    local.get $value
     local.get $low
-    local.get $value
     i32.ge_s
-    local.get $high
     local.get $value
+    local.get $high
     i32.le_s
     i32.and
   )
@@ -305,4 +308,48 @@
 
     i32.const 1
   )
+
+  ;; Manually place each piece on the board to initialize the game
+  (func $initBoard
+    ;; place white pieces at the top of the board
+    (call $setPiece (i32.const 1) (i32.const 0) (global.get $WHITE))
+    (call $setPiece (i32.const 3) (i32.const 0) (global.get $WHITE))
+    (call $setPiece (i32.const 5) (i32.const 0) (global.get $WHITE))
+    (call $setPiece (i32.const 7) (i32.const 0) (global.get $WHITE))
+
+    (call $setPiece (i32.const 0) (i32.const 1) (global.get $WHITE))
+    (call $setPiece (i32.const 2) (i32.const 1) (global.get $WHITE))
+    (call $setPiece (i32.const 4) (i32.const 1) (global.get $WHITE))
+    (call $setPiece (i32.const 6) (i32.const 1) (global.get $WHITE))
+
+    (call $setPiece (i32.const 1) (i32.const 2) (global.get $WHITE))
+    (call $setPiece (i32.const 3) (i32.const 2) (global.get $WHITE))
+    (call $setPiece (i32.const 5) (i32.const 2) (global.get $WHITE))
+    (call $setPiece (i32.const 7) (i32.const 2) (global.get $WHITE))
+
+    ;; place black pieces at the bottom of the board
+    (call $setPiece (i32.const 0) (i32.const 5) (global.get $BLACK))
+    (call $setPiece (i32.const 2) (i32.const 5) (global.get $BLACK))
+    (call $setPiece (i32.const 4) (i32.const 5) (global.get $BLACK))
+    (call $setPiece (i32.const 6) (i32.const 5) (global.get $BLACK))
+    
+    (call $setPiece (i32.const 1) (i32.const 6) (global.get $BLACK))
+    (call $setPiece (i32.const 3) (i32.const 6) (global.get $BLACK))
+    (call $setPiece (i32.const 5) (i32.const 6) (global.get $BLACK))
+    (call $setPiece (i32.const 7) (i32.const 6) (global.get $BLACK))
+
+    (call $setPiece (i32.const 0) (i32.const 7) (global.get $BLACK))
+    (call $setPiece (i32.const 2) (i32.const 7) (global.get $BLACK))
+    (call $setPiece (i32.const 4) (i32.const 7) (global.get $BLACK))
+    (call $setPiece (i32.const 6) (i32.const 7) (global.get $BLACK))
+
+    (call $setTurnOwner (i32.const 1)) ;; black goes first
+  )
+
+  (export "getPiece" (func $getPiece))
+  (export "isCrowned" (func $isCrowned))
+  (export "initBoard" (func $initBoard))
+  (export "getTurnOwner" (func $getTurnOwner))
+  (export "move" (func $move))
+  (export "memory" (memory $mem))
 )
