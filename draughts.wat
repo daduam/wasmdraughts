@@ -3,6 +3,8 @@
   (global $WHITE i32 (i32.const 2))
   (global $CROWN i32 (i32.const 4))
 
+  (global $currentTurn (mut i32) (i32.const 0))
+
   (memory $mem 1)
 
   (func $indexForPosition (param $x i32) (param $y i32) (result i32)
@@ -104,5 +106,39 @@
     else
       unreachable
     end
+  )
+
+  ;; $getTurnOwner gets the current turn owner (black or white)
+  (func $getTurnOwner (result i32)
+    global.get $currentTurn
+  )
+
+  ;; $setTurnOwner sets the turn owner
+  (func $setTurnOwner (param $piece i32)
+    local.get $piece
+    global.set $currentTurn
+  )
+
+  ;; $toggleTurnOwner switches turn owner to other player
+  (func $toggleTurnOwner
+    call $getTurnOwner
+    i32.const 1
+    i32.eq
+    if
+      i32.const 2
+      call $setTurnOwner
+    else
+      i32.const 1
+      call $setTurnOwner
+    end
+  )
+
+  ;; $isPlayersTurn determines if it is a player's turn
+  (func $isPlayersTurn (param $player i32) (result i32)
+    local.get $player
+    call $getTurnOwner
+    i32.and
+    i32.const 0
+    i32.gt_s
   )
 )
