@@ -62,4 +62,47 @@
     i32.const 3
     i32.or
   )
+
+  ;; $setPiece sets a piece on the board
+  (func $setPiece (param $x i32) (param $y i32) (param $piece i32)
+    local.get $x
+    local.get $y
+    call $offsetForPosition
+    local.get $piece
+    i32.store
+  )
+
+  ;; $inRange detects if values are within range (low and high inclusive)
+  (func $inRange (param $low i32) (param $high i32) (param $value i32) (result i32)
+    local.get $low
+    local.get $value
+    i32.ge_s
+    local.get $high
+    local.get $value
+    i32.le_s
+    i32.and
+  )
+
+  ;; $getPiece Gets a piece from the board. Out of range causes a trap
+  (func $getPiece (param $x i32) (param $y i32) (result i32)
+    block (result i32)
+      i32.const 0
+      i32.const 7
+      local.get $x
+      call $inRange
+      i32.const 0
+      i32.const 7
+      local.get $y
+      call $inRange
+      i32.and
+    end
+    if (result i32)
+      local.get $x
+      local.get $y
+      call $offsetForPosition
+      i32.load
+    else
+      unreachable
+    end
+  )
 )
